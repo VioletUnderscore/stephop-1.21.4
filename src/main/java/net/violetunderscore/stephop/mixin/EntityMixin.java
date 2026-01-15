@@ -16,8 +16,9 @@ import net.minecraft.util.profiler.Profilers;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.nerdorg.minehop.config.ConfigWrapper;
 import net.nerdorg.minehop.config.MinehopConfig;
+import net.violetunderscore.stephop.config.ConfigWrapper;
+import net.violetunderscore.stephop.config.StephopConfig;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -173,7 +174,8 @@ public abstract class EntityMixin {
 
     @Unique
     private Vec3d adjustMovementForCollisions(Vec3d movement) {
-        MinehopConfig config = ConfigWrapper.config;
+        StephopConfig config = ConfigWrapper.config;
+        MinehopConfig minehopConfig = net.nerdorg.minehop.config.ConfigWrapper.config;
 
         Entity self = (Entity) this.getWorld().getEntityById(this.getId());
 
@@ -184,18 +186,26 @@ public abstract class EntityMixin {
         boolean bl2 = movement.y != vec3d.y;
         boolean bl3 = movement.z != vec3d.z;
         boolean bl4 = bl2 && movement.y < (double)0.0F;
+
+        float newStepHeight = this.getStepHeight();
+        boolean b = false;
+        if ((this.isSneaking() || !config.require_crouching) && minehopConfig.enabled) {
+            newStepHeight = Math.max(newStepHeight, config.step_height);
+            b = true;
+        }
+
         if (this.getStepHeight() > 0.0F
-                && ((bl4 || this.isOnGround()) || (this.isSneaking() && config.enabled))
+                && ((bl4 || this.isOnGround()) || b)
                 && (bl || bl3)) {
             Box box2 = bl4 ? box.offset((double)0.0F, vec3d.y, (double)0.0F) : box;
-            Box box3 = box2.stretch(movement.x, (double)this.getStepHeight()*((this.isSneaking() && config.enabled)?2:1), movement.z);
+            Box box3 = box2.stretch(movement.x, newStepHeight, movement.z);
             if (!bl4) {
                 box3 = box3.stretch((double)0.0F, (double)-1.0E-5F, (double)0.0F);
             }
 
             List<VoxelShape> list2 = findCollisionsForMovement(self, this.world, list, box3);
             float f = (float)vec3d.y;
-            float[] fs = collectStepHeights(box2, list2, this.getStepHeight()*((this.isSneaking() && config.enabled)?2:1), f);
+            float[] fs = collectStepHeights(box2, list2, newStepHeight, f);
 
             for(float g : fs) {
                 Vec3d vec3d2 = adjustMovementForCollisions(new Vec3d(movement.x, (double)g, movement.z), box2, list2);
