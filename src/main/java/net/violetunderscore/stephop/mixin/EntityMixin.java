@@ -21,6 +21,7 @@ import net.nerdorg.minehop.config.MinehopConfig;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -76,10 +77,7 @@ public abstract class EntityMixin {
     @Inject(method = "move", at = @At("HEAD"), cancellable = true)
     public void move(MovementType type, Vec3d movement, CallbackInfo ci) {
         Entity self = this.getWorld().getEntityById(this.getId());
-
-        //Disable if it's disabled lol
         if (!MinehopConfig.enabled) { return; }
-
         if (!(self instanceof PlayerEntity p)) { return; }
 
         if (this.noClip) {
@@ -143,7 +141,7 @@ public abstract class EntityMixin {
             } else {
                 if (this.horizontalCollision) {
                     Vec3d vec3d2 = this.getVelocity();
-                    if (!this.isSneaking()) {
+                    if (!(this.isSneaking() && MinehopConfig.enabled)) {
                         this.setVelocity(bl ? (double) 0.0F : vec3d2.x, vec3d2.y, bl2 ? (double) 0.0F : vec3d2.z);
                     } else {
                         this.setVelocity(bl ? Math.max((double) 0.0F, vec3d2.x - 0.2) : vec3d2.x, vec3d2.y, bl2 ? Math.max((double) 0.0F, vec3d2.z - 0.2) : vec3d2.z);
@@ -173,6 +171,7 @@ public abstract class EntityMixin {
         ci.cancel();
     }
 
+    @Unique
     private Vec3d adjustMovementForCollisions(Vec3d movement) {
         MinehopConfig config = ConfigWrapper.config;
 

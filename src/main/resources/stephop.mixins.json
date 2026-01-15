@@ -3,7 +3,8 @@
 	"package": "net.violetunderscore.stephop.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-      "EntityMixin"
+      "EntityMixin",
+      "ServerPlayNetworkHandlerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
