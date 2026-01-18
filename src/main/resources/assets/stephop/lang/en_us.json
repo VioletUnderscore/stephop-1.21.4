@@ -1,5 +1,6 @@
 {
   "text.autoconfig.stephop.title": "Stephop Config",
   "text.autoconfig.stephop.option.step_height": "Step Height",
-  "text.autoconfig.stephop.option.require_crouching": "Require Crouching"
+  "text.autoconfig.stephop.option.require_crouching": "Require Crouching",
+  "text.autoconfig.stephop.option.disable_weird_movement_checks": "Disable Weird Movement Checks"
 }

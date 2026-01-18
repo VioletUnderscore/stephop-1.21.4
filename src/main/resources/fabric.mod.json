@@ -20,7 +20,10 @@
 		],
 		"client": [
 			"net.violetunderscore.stephop.StepHopClient"
-		]
+		],
+        "modmenu": [
+            "net.violetunderscore.stephop.config.ModMenuIntegration"
+        ]
 	},
 	"mixins": [
 		"stephop.mixins.json",
